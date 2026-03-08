@@ -3,18 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pellicule — Album Partagé</title>
+<title>Renouvellement de Vœux — Album Photo</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --noir: #0d0d0d;
-    --creme: #f2ede4;
-    --or: #c9a84c;
-    --or-pale: #e8c97a;
-    --gris: #2a2a2a;
-    --gris-clair: #3d3d3d;
-    --rouge: #c0392b;
-    --ombre: rgba(0,0,0,0.45);
+    --noir: #2a3028;        /* Vert sauge très foncé — fond principal */
+    --creme: #f5f0e8;       /* Crème parchmin */
+    --beige: #e8dcc8;       /* Beige chaud */
+    --sable: #c8a882;       /* Sable doré */
+    --brun: #7a5c48;        /* Brun chocolat chaud */
+    --brun-pale: #a07858;   /* Brun clair */
+    --sage: #8aaa7e;        /* Vert sauge — COULEUR PRINCIPALE */
+    --sage-pale: #adc49f;   /* Sauge clair */
+    --sage-fonce: #5a7850;  /* Sauge foncé */
+    --or: #8aaa7e;          /* Sauge comme accent */
+    --or-pale: #adc49f;     /* Sauge pâle */
+    --rouge: #7a5c48;       /* Brun pour danger */
+    --ombre: rgba(42,48,40,0.45);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,8 +46,9 @@
   #screenHome::before {
     content: '';
     position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 20%, rgba(201,168,76,0.05) 0%, transparent 50%);
+    background: radial-gradient(ellipse at 25% 60%, rgba(138,170,126,0.18) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 25%, rgba(138,170,126,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(122,92,72,0.1) 0%, transparent 45%);
     pointer-events: none;
   }
 
@@ -56,7 +62,7 @@
 
   .home-icon {
     width: 72px; height: 72px;
-    border: 1px solid rgba(201,168,76,0.3);
+    border: 1px solid rgba(138,170,126,0.45);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 24px;
@@ -66,20 +72,21 @@
   .home-icon::before {
     content: '';
     position: absolute; inset: 6px;
-    border: 1px solid rgba(201,168,76,0.15);
+    border: 1px solid rgba(138,170,126,0.2);
     border-radius: 50%;
   }
 
-  .home-icon svg { color: var(--or); }
+  .home-icon svg { color: var(--sage); }
 
   .home-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 56px; font-weight: 300;
-    letter-spacing: -1px;
-    line-height: 1;
+    font-size: 38px; font-weight: 300;
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+    text-align: center;
   }
 
-  .home-title em { font-style: italic; color: var(--or); }
+  .home-title em { font-style: italic; color: var(--sage-pale); }
 
   .home-sub {
     font-size: 9px; letter-spacing: 4px;
@@ -92,7 +99,7 @@
 
   .btn-primary {
     padding: 18px 24px;
-    background: var(--or);
+    background: var(--sage);
     color: var(--noir);
     border: none; border-radius: 2px;
     font-family: 'Space Mono', monospace;
@@ -101,13 +108,13 @@
     cursor: pointer; transition: all 0.2s;
     display: flex; align-items: center; justify-content: center; gap: 10px;
   }
-  .btn-primary:hover { background: var(--or-pale); transform: translateY(-1px); }
+  .btn-primary:hover { background: var(--sage-pale); transform: translateY(-1px); }
 
   .btn-secondary {
     padding: 16px 24px;
     background: transparent;
-    color: rgba(242,237,228,0.4);
-    border: 1px solid rgba(242,237,228,0.1);
+    color: rgba(245,240,232,0.45);
+    border: 1px solid rgba(138,170,126,0.2);
     border-radius: 2px;
     font-family: 'Space Mono', monospace;
     font-size: 11px; letter-spacing: 2px;
@@ -115,7 +122,7 @@
     cursor: pointer; transition: all 0.2s;
     display: flex; align-items: center; justify-content: center; gap: 10px;
   }
-  .btn-secondary:hover { border-color: var(--or); color: var(--or); }
+  .btn-secondary:hover { border-color: var(--sable); color: var(--sable); }
 
   /* ── LOGIN ── */
   #screenLogin {
@@ -144,7 +151,7 @@
     text-align: center; border-radius: 2px; outline: none;
     transition: border-color 0.2s;
   }
-  .login-input:focus { border-color: var(--or); }
+  .login-input:focus { border-color: var(--sage); }
   .login-input::placeholder { letter-spacing: 3px; font-size: 12px; opacity: 0.4; }
 
   .login-error {
@@ -167,8 +174,8 @@
   .guest-bar {
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px 20px;
-    background: rgba(0,0,0,0.8);
-    border-bottom: 1px solid rgba(201,168,76,0.1);
+    background: rgba(42,48,40,0.95);
+    border-bottom: 1px solid rgba(138,170,126,0.25);
     position: relative; z-index: 10;
   }
 
@@ -179,16 +186,19 @@
 
   .sent-badge {
     font-size: 9px; letter-spacing: 2px;
-    color: var(--or); text-transform: uppercase;
-    background: rgba(201,168,76,0.1);
+    color: var(--sage-pale); text-transform: uppercase;
+    background: rgba(138,170,126,0.15);
     padding: 5px 10px; border-radius: 20px;
-    border: 1px solid rgba(201,168,76,0.2);
+    border: 1px solid rgba(138,170,126,0.3);
   }
 
   .viewfinder {
     flex: 1; position: relative; overflow: hidden;
     background: #000; min-height: 50vh;
     display: flex; align-items: center; justify-content: center;
+    aspect-ratio: 3/4;
+    max-height: 70vh;
+    width: 100%;
   }
 
   #video {
@@ -203,7 +213,7 @@
 
   .vf-corner {
     position: absolute; width: 24px; height: 24px;
-    border-color: rgba(201,168,76,0.5); border-style: solid;
+    border-color: rgba(138,170,126,0.7); border-style: solid;
   }
   .vf-corner.tl { top:16px; left:16px; border-width:2px 0 0 2px; }
   .vf-corner.tr { top:16px; right:16px; border-width:2px 2px 0 0; }
@@ -214,7 +224,7 @@
     position: absolute; top:50%; left:50%;
     transform: translate(-50%,-50%);
     width: 44px; height: 44px;
-    border: 1px solid rgba(201,168,76,0.3);
+    border: 1px solid rgba(138,170,126,0.45);
     border-radius: 50%;
   }
 
@@ -228,14 +238,14 @@
     position: absolute; top: 16px; right: 16px;
     z-index: 10; width: 44px; height: 44px;
     border-radius: 50%;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(42,48,40,0.65);
+    border: 1px solid rgba(138,170,126,0.4);
     color: var(--creme);
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; backdrop-filter: blur(6px);
     transition: all 0.2s; pointer-events: all;
   }
-  .flip-btn:hover { background: rgba(201,168,76,0.2); border-color: var(--or); }
+  .flip-btn:hover { background: rgba(138,170,126,0.3); border-color: var(--sage-pale); }
   .flip-btn.spin svg { animation: spin 0.4s ease; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -243,17 +253,31 @@
     position: absolute; inset: 0;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    color: rgba(242,237,228,0.2);
+    color: rgba(245,240,232,0.2);
     gap: 12px; font-size: 10px;
     letter-spacing: 3px; text-transform: uppercase;
   }
 
   .guest-bottom {
     padding: 24px 24px 40px;
-    background: #000;
+    background: var(--noir);
     display: flex; flex-direction: column;
     align-items: center; gap: 14px;
   }
+
+  .close-cam-btn {
+    position: absolute; top: 16px; left: 16px;
+    z-index: 10; width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(42,48,40,0.65);
+    border: 1px solid rgba(138,170,126,0.35);
+    color: var(--creme);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; backdrop-filter: blur(6px);
+    font-size: 18px; line-height: 1;
+    transition: all 0.2s;
+  }
+  .close-cam-btn:hover { background: rgba(122,92,72,0.45); border-color: var(--brun-pale); }
 
   .shutter-row {
     display: flex; align-items: center;
@@ -262,10 +286,10 @@
 
   .shutter {
     width: 76px; height: 76px; border-radius: 50%;
-    background: #000;
-    border: 3px solid var(--or);
+    background: var(--noir);
+    border: 3px solid var(--sage);
     cursor: pointer; position: relative;
-    box-shadow: 0 0 0 6px rgba(201,168,76,0.1), 0 0 32px rgba(201,168,76,0.15);
+    box-shadow: 0 0 0 6px rgba(138,170,126,0.14), 0 0 32px rgba(138,170,126,0.2);
     transition: transform 0.1s, box-shadow 0.2s;
     flex-shrink: 0;
   }
@@ -273,23 +297,23 @@
     content: '';
     position: absolute; inset: 9px;
     border-radius: 50%;
-    background: var(--or);
+    background: var(--sage);
     transition: transform 0.1s;
   }
-  .shutter:hover { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(201,168,76,0.15), 0 0 40px rgba(201,168,76,0.2); }
+  .shutter:hover { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(138,170,126,0.2), 0 0 40px rgba(138,170,126,0.28); }
   .shutter:active { transform: scale(0.93); }
   .shutter:active::before { transform: scale(0.86); }
   .shutter:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .flip-side {
     width: 48px; height: 48px; border-radius: 50%;
-    background: rgba(242,237,228,0.05);
-    border: 1px solid rgba(242,237,228,0.1);
-    color: rgba(242,237,228,0.5);
+    background: rgba(245,240,232,0.05);
+    border: 1px solid rgba(138,170,126,0.2);
+    color: rgba(245,240,232,0.5);
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s; flex-shrink: 0;
   }
-  .flip-side:hover { border-color: var(--or); color: var(--or); }
+  .flip-side:hover { border-color: var(--sage-pale); color: var(--sage-pale); }
 
   .upload-msg {
     font-size: 9px; letter-spacing: 2px;
@@ -298,7 +322,7 @@
     min-height: 14px; text-align: center;
     transition: color 0.3s;
   }
-  .upload-msg.loading { color: var(--or); }
+  .upload-msg.loading { color: var(--sage-pale); }
   .upload-msg.success { color: #6abf69; }
   .upload-msg.error { color: var(--rouge); }
 
@@ -311,7 +335,7 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 18px 32px;
     background: var(--noir);
-    border-bottom: 1px solid rgba(201,168,76,0.2);
+    border-bottom: 1px solid rgba(138,170,126,0.2);
     position: sticky; top: 0; z-index: 100;
   }
 
@@ -319,7 +343,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 26px; font-weight: 300; color: var(--creme);
   }
-  .admin-logo em { font-style: italic; color: var(--or); }
+  .admin-logo em { font-style: italic; color: var(--sage-pale); }
 
   .nav-actions { display: flex; gap: 10px; }
 
@@ -331,12 +355,12 @@
     border-radius: 2px; cursor: pointer;
     transition: all 0.2s; border: none;
   }
-  .nav-btn-gold { background: var(--or); color: var(--noir); }
-  .nav-btn-gold:hover { background: var(--or-pale); }
+  .nav-btn-gold { background: var(--sage); color: var(--noir); }
+  .nav-btn-gold:hover { background: var(--sage-pale); }
   .nav-btn-outline { background: transparent; border: 1px solid rgba(242,237,228,0.15); color: rgba(242,237,228,0.4); }
   .nav-btn-outline:hover { border-color: var(--rouge); color: var(--rouge); }
   .nav-btn-ghost { background: transparent; border: 1px solid rgba(242,237,228,0.1); color: rgba(242,237,228,0.3); }
-  .nav-btn-ghost:hover { border-color: var(--or); color: var(--or); }
+  .nav-btn-ghost:hover { border-color: var(--sage-pale); color: var(--sage-pale); }
 
   .admin-body { padding: 36px 32px; max-width: 1300px; margin: 0 auto; }
 
@@ -350,25 +374,25 @@
     font-size: 42px; font-weight: 300;
     color: var(--noir);
   }
-  .album-heading em { font-style: italic; color: var(--or); }
+  .album-heading em { font-style: italic; color: var(--sage-fonce); }
 
   .album-count {
     font-size: 10px; letter-spacing: 2px;
     text-transform: uppercase;
-    color: rgba(13,13,13,0.35);
+    color: rgba(44,33,24,0.4);
   }
 
   /* Loading spinner */
   .spinner {
     display: flex; align-items: center; justify-content: center;
     padding: 80px; gap: 12px;
-    color: rgba(13,13,13,0.3); font-size: 10px; letter-spacing: 2px;
+    color: rgba(44,33,24,0.3); font-size: 10px; letter-spacing: 2px;
     text-transform: uppercase;
   }
   .spinner-ring {
     width: 24px; height: 24px; border-radius: 50%;
-    border: 2px solid rgba(201,168,76,0.2);
-    border-top-color: var(--or);
+    border: 2px solid rgba(138,170,126,0.2);
+    border-top-color: var(--sage);
     animation: rotate 0.8s linear infinite;
   }
   @keyframes rotate { to { transform: rotate(360deg); } }
@@ -416,7 +440,7 @@
     text-transform: uppercase; border: none;
     border-radius: 2px; cursor: pointer; transition: all 0.15s;
   }
-  .pa-dl { background: var(--or); color: var(--noir); }
+  .pa-dl { background: var(--sage); color: var(--noir); }
   .pa-dl:hover { background: var(--or-pale); }
   .pa-rm { background: rgba(192,57,43,0.85); color: white; }
   .pa-rm:hover { background: var(--rouge); }
@@ -425,7 +449,7 @@
     padding: 8px 2px 2px;
     display: flex; justify-content: space-between; align-items: center;
   }
-  .pm-num { font-size: 9px; color: var(--or); letter-spacing: 1px; }
+  .pm-num { font-size: 9px; color: var(--sage-fonce); letter-spacing: 1px; }
   .pm-time { font-size: 9px; color: rgba(13,13,13,0.35); }
 
   .empty {
@@ -469,7 +493,7 @@
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
     cursor: pointer; font-size: 22px; transition: all 0.2s;
   }
-  .lb-nav:hover { background: rgba(201,168,76,0.2); border-color: var(--or); }
+  .lb-nav:hover { background: rgba(138,170,126,0.2); border-color: var(--sage); }
   .lb-prev { left: 20px; }
   .lb-next { right: 20px; }
 
@@ -480,7 +504,7 @@
     background: var(--noir); color: var(--creme);
     padding: 12px 24px; border-radius: 2px;
     font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
-    border-left: 3px solid var(--or);
+    border-left: 3px solid var(--sage);
     transition: transform 0.3s ease;
     z-index: 9999; white-space: nowrap;
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
@@ -515,7 +539,7 @@
           <circle cx="12" cy="13" r="4"/>
         </svg>
       </div>
-      <div class="home-title">Pelli<em>cule</em></div>
+      <div class="home-title">Renouvellement<br><em>de Vœux</em></div>
       <div class="home-sub">Album photo partagé</div>
     </div>
     <div class="home-btns">
@@ -550,7 +574,7 @@
 <!-- ── INVITÉ ── -->
 <div class="screen" id="screenGuest">
   <div class="guest-bar">
-    <div class="guest-logo">Pellicule</div>
+    <div class="guest-logo">Renouvellement de Vœux</div>
     <div class="sent-badge" id="sentBadge">0 photo envoyée</div>
   </div>
 
@@ -565,6 +589,7 @@
       <div class="vf-center"></div>
     </div>
     <div class="flash-overlay" id="flash"></div>
+    <button class="close-cam-btn" id="closeCamBtn" title="Retour à l'accueil">✕</button>
     <button class="flip-btn" id="flipBtn">
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
@@ -593,7 +618,7 @@
 <!-- ── ADMIN ── -->
 <div class="screen" id="screenAdmin">
   <nav class="admin-nav">
-    <div class="admin-logo">Mon <em>Album</em></div>
+    <div class="admin-logo">Renouvellement <em>de Vœux</em></div>
     <div class="nav-actions">
       <button class="nav-btn nav-btn-ghost" id="btnRefresh">↻ <span>Actualiser</span></button>
       <button class="nav-btn nav-btn-gold" id="btnDlAll">↓ <span>Tout télécharger</span></button>
@@ -602,7 +627,7 @@
   </nav>
   <div class="admin-body">
     <div class="album-info">
-      <div class="album-heading">Renou<em>vellement</em></div>
+      <div class="album-heading">Notre <em>Album</em></div>
       <div class="album-count" id="albumCount">— photos</div>
     </div>
     <div id="photoGrid" class="photo-grid">
@@ -645,6 +670,12 @@ function showScreen(id) {
 document.getElementById('btnGuest').addEventListener('click', () => {
   showScreen('screenGuest');
   startCamera();
+});
+
+// Bouton croix — quitter la caméra
+document.getElementById('closeCamBtn').addEventListener('click', () => {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  showScreen('screenHome');
 });
 document.getElementById('btnAdminGo').addEventListener('click', () => showScreen('screenLogin'));
 document.getElementById('btnLoginBack').addEventListener('click', () => showScreen('screenHome'));
