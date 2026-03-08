@@ -152,6 +152,37 @@
   .corner.bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
   .corner.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
 
+  .flip-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 5;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(26,18,9,0.5);
+    border: 1px solid rgba(200,131,42,0.4);
+    color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+  }
+
+  .flip-btn:hover {
+    background: rgba(200,131,42,0.4);
+    border-color: var(--amber);
+    transform: scale(1.1);
+  }
+
+  .flip-btn.spinning svg {
+    animation: spin360 0.4s ease;
+  }
+
+  @keyframes spin360 {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
   .flash-overlay {
     position: absolute;
     inset: 0;
@@ -504,6 +535,38 @@
 
   .toast.show { transform: translateX(-50%) translateY(0); }
 
+  .storage-indicator {
+    padding: 4px 0;
+  }
+
+  .storage-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(26,18,9,0.45);
+    margin-bottom: 7px;
+  }
+
+  .storage-bar-bg {
+    height: 4px;
+    background: var(--grain);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .storage-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    background: var(--amber);
+    transition: width 0.5s ease, background 0.3s;
+  }
+
+  .storage-bar-fill.warning { background: #e07820; }
+  .storage-bar-fill.danger  { background: var(--red); }
+
   /* Hidden file input */
   #fileInput { display: none; }
 
@@ -540,6 +603,11 @@
         <div class="corner br"></div>
       </div>
       <div class="flash-overlay" id="flash"></div>
+      <button class="flip-btn" id="flipBtn" title="Retourner la caméra">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </button>
       <div class="no-camera-msg" id="noCameraMsg" style="display:none">
         <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
           <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
@@ -568,7 +636,17 @@
 
       <div class="divider"></div>
 
-      <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">
+      <div class="storage-indicator">
+        <div class="storage-label">
+          <span>Stockage local</span>
+          <span id="storageText">0 Mo / 4 Mo</span>
+        </div>
+        <div class="storage-bar-bg">
+          <div class="storage-bar-fill" id="storageFill"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
         </svg>
@@ -630,6 +708,76 @@
   let currentLb = 0;
   let stream = null;
 
+  // ── Persistance locale ──────────────────────────────────────────
+  const STORAGE_KEY = 'pellicule_album';
+
+  const STORAGE_LIMIT_MB = 4; // Déclenche l'auto-export à 4 Mo (limite réelle ~5 Mo)
+
+  function getStorageSizeMB() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? (raw.length * 2) / (1024 * 1024) : 0; // UTF-16 → bytes
+    } catch(e) { return 0; }
+  }
+
+  async function autoExportIfNeeded() {
+    const sizeMB = getStorageSizeMB();
+    if (sizeMB >= STORAGE_LIMIT_MB) {
+      showToast('📦 Stockage plein — export automatique en cours...');
+      await new Promise(r => setTimeout(r, 800));
+      await downloadAllZip(`pellicule-auto-${Date.now()}`);
+      // Vide l'album après export
+      photos = [];
+      localStorage.removeItem(STORAGE_KEY);
+      renderGrid();
+      updateCounter();
+      updateStorageBar();
+      showToast('✅ Album exporté et vidé automatiquement');
+    }
+  }
+
+  async function saveToStorage() {
+    try {
+      const data = photos.map(p => ({ src: p.src, time: p.time, date: p.date }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      updateStorageBar();
+      await autoExportIfNeeded();
+    } catch(e) {
+      // Quota dépassé immédiatement
+      showToast('📦 Quota dépassé — export automatique...');
+      await downloadAllZip(`pellicule-auto-${Date.now()}`);
+      photos = [];
+      localStorage.removeItem(STORAGE_KEY);
+      renderGrid();
+      updateCounter();
+    }
+  }
+
+  function updateStorageBar() {
+    const sizeMB = getStorageSizeMB();
+    const pct = Math.min((sizeMB / STORAGE_LIMIT_MB) * 100, 100);
+    const fill = document.getElementById('storageFill');
+    const text = document.getElementById('storageText');
+    if (!fill) return;
+    fill.style.width = pct + '%';
+    text.textContent = sizeMB.toFixed(1) + ' Mo / ' + STORAGE_LIMIT_MB + ' Mo';
+    fill.className = 'storage-bar-fill' + (pct >= 90 ? ' danger' : pct >= 65 ? ' warning' : '');
+  }
+
+  function loadFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        photos = JSON.parse(raw);
+        renderGrid();
+        updateCounter();
+        if (photos.length > 0) showToast(`${photos.length} photo(s) restaurée(s) 📂`);
+      }
+      updateStorageBar();
+    } catch(e) { photos = []; }
+  }
+  // ────────────────────────────────────────────────────────────────
+
   // Toast
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -645,23 +793,42 @@
   }
 
   // Start camera
-  async function startCamera() {
+  let facingMode = 'environment'; // 'environment' = arrière, 'user' = selfie
+
+  async function startCamera(facing) {
+    if (facing) facingMode = facing;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      // Stoppe le stream précédent si existant
+      if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: false });
       video.srcObject = stream;
+      // Mirror pour selfie
+      video.style.transform = facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
       video.style.display = 'block';
       noCameraMsg.style.display = 'none';
       startCameraBtn.style.display = 'none';
-      showToast('Caméra activée');
+      document.getElementById('flipBtn').style.display = 'flex';
+      showToast(facingMode === 'user' ? '🤳 Caméra selfie' : '📷 Caméra arrière');
     } catch (e) {
       video.style.display = 'none';
       noCameraMsg.style.display = 'flex';
+      document.getElementById('flipBtn').style.display = 'none';
       showToast('Impossible d\'accéder à la caméra');
     }
   }
 
-  startCameraBtn.addEventListener('click', startCamera);
-  startCamera(); // Auto-start
+  // Flip camera button
+  const flipBtn = document.getElementById('flipBtn');
+  flipBtn.style.display = 'none'; // caché jusqu'à activation
+  flipBtn.addEventListener('click', () => {
+    flipBtn.classList.add('spinning');
+    setTimeout(() => flipBtn.classList.remove('spinning'), 420);
+    startCamera(facingMode === 'environment' ? 'user' : 'environment');
+  });
+
+  startCameraBtn.addEventListener('click', () => startCamera());
+  loadFromStorage();
+  startCamera();
 
   // Capture photo
   shutterBtn.addEventListener('click', () => {
@@ -677,6 +844,11 @@
     const ctx = canvas.getContext('2d');
     canvas.width = video.videoWidth || 1280;
     canvas.height = video.videoHeight || 960;
+    // Miroir pour selfie
+    if (facingMode === 'user') {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
     ctx.drawImage(video, 0, 0);
 
     const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
@@ -692,6 +864,7 @@
     photos.push({ src: dataUrl, time, date });
     renderGrid();
     updateCounter();
+    saveToStorage();
   }
 
   // Render grid
@@ -757,28 +930,32 @@
     photos.splice(i, 1);
     renderGrid();
     updateCounter();
+    saveToStorage();
     showToast('Photo supprimée');
   }
 
-  // Download all (ZIP via canvas trick — direct multiple downloads)
+  // Fonction ZIP réutilisable
+  async function downloadAllZip(filename = 'pellicule-album') {
+    const JSZip = await loadJSZip();
+    const zip = new JSZip();
+    photos.forEach((p, i) => {
+      const base64 = p.src.split(',')[1];
+      zip.file(`pellicule-${String(i+1).padStart(3,'0')}.jpg`, base64, { base64: true });
+    });
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename + '.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Download all
   document.getElementById('downloadAllBtn').addEventListener('click', async () => {
     if (photos.length === 0) { showToast('Album vide !'); return; }
-
-    // Try JSZip if available, otherwise sequential downloads
     try {
-      const JSZip = await loadJSZip();
-      const zip = new JSZip();
-      photos.forEach((p, i) => {
-        const base64 = p.src.split(',')[1];
-        zip.file(`pellicule-${String(i+1).padStart(3,'0')}.jpg`, base64, { base64: true });
-      });
-      const blob = await zip.generateAsync({ type: 'blob' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'pellicule-album.zip';
-      a.click();
-      URL.revokeObjectURL(url);
+      await downloadAllZip('pellicule-album');
       showToast(`${photos.length} photos téléchargées en ZIP`);
     } catch(e) {
       // Fallback: download one by one
@@ -812,6 +989,8 @@
       photos = [];
       renderGrid();
       updateCounter();
+      saveToStorage();
+      updateStorageBar();
       showToast('Album vidé');
     }
   });
